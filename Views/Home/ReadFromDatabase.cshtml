@@ -1,0 +1,77 @@
+﻿@model Task2.Models.ViewModels.StatementViewModel
+
+<h1>Statement: @Model.StatementName</h1>
+<p>Bank: @Model.BankName</p>
+<p>Creation Date: @Model.CreationDate</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Б/сч</th>
+            <th>Opening Balance (Debit)</th>
+            <th>Opening Balance (Credit)</th>
+            <th>Turnover Debit</th>
+            <th>Turnover Credit</th>
+            <th>Closing Balance (Debit)</th>
+            <th>Closing Balance (Credit)</th>
+        </tr>
+    </thead>
+    </table>
+    @foreach (var classGroup in Model.TurnoverGroups)
+    {
+        <h2>Class: @classGroup.AccountClassName</h2>
+
+    <table class="table">
+        @foreach (var subGroup in classGroup.SubGroups)
+        {
+
+                
+                    @foreach (var turnover in subGroup.Turnovers)
+                    {
+                        <tr>
+                            <td>@turnover.AccountNumber</td>
+                            <td>@turnover.OpeningBalanceDebit</td>
+                            <td>@turnover.OpeningBalanceCredit</td>
+                            <td>@turnover.TurnoverDebit</td>
+                            <td>@turnover.TurnoverCredit</td>
+                            <td>@turnover.ClosingBalanceDebit</td>
+                            <td>@turnover.ClosingBalanceCredit</td>
+                        </tr>
+                }
+            <tr><td>Subgroup: @subGroup.SubGroup</td></tr>
+                <tr>
+                    <td></td>
+                    <td>Opening Debit: @subGroup.Turnovers.Sum(c => c.OpeningBalanceDebit)</td>
+                    <td>Opening Credit: @subGroup.Turnovers.Sum(c => c.OpeningBalanceCredit)</td>
+                    <td>Balance Debit: @subGroup.Turnovers.Sum(c => c.TurnoverDebit)</td>
+                    <td>Balance Credit: @subGroup.Turnovers.Sum(c => c.TurnoverCredit)</td>
+                    <td>Closing Balance Debit: @subGroup.Turnovers.Sum(c => c.ClosingBalanceDebit)</td>
+                    <td>Closing Balance Credit: @subGroup.Turnovers.Sum(c => c.ClosingBalanceCredit)</td>
+                </tr>
+                
+        }
+        <tr><td>По классу:</td></tr>
+        <tr>
+            <td></td>
+            <td>Opening Debit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(a => a.OpeningBalanceDebit))</td>
+            <td>Opening Credit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.OpeningBalanceCredit))</td>
+            <td>Balance Debit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.TurnoverDebit))</td>
+            <td>Balance Credit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.TurnoverCredit))</td>
+            <td>Closing Balance Debit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.ClosingBalanceDebit))</td>
+            <td>Closing Balance Credit: @classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.ClosingBalanceCredit))</td>
+        </tr>
+
+    </table>
+    }
+    <table>
+    <tr>РАСЧЁТ:</tr>
+    <tr>
+        <td></td>
+        <td>Opening Debit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(a => a.OpeningBalanceDebit)))</td>
+        <td>Opening Credit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.OpeningBalanceCredit)))</td>
+        <td>Balance Debit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.TurnoverDebit)))</td>
+        <td>Balance Credit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.TurnoverCredit)))</td>
+        <td>Closing Balance Debit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.ClosingBalanceDebit)))</td>
+        <td>Closing Balance Credit: @Model.TurnoverGroups.Sum(classGroup => classGroup.SubGroups.Sum(c => c.Turnovers.Sum(c => c.ClosingBalanceCredit)))</td>
+    </tr>
+    </table>

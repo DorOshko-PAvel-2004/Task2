@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Task2.Models.Entities.Statement>
+
+
+<h1>Statements</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Statement Name</th>
+            <th>Creation Date</th>
+            <th>Bank</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var statement in Model)
+        {
+            <tr>
+                <td>@statement.StatementName</td>
+                <td>@statement.CreationDate.ToString("dd/MM/yyyy")</td>
+                <td>@statement.Bank.BankName</td>
+                <td>
+                    <a asp-action="ReadFromDatabase" asp-route-statementId="@statement.StatementId" class="btn btn-primary">
+                        View Records
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<form asp-controller="Home" , asp-action="UploadExcel" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="fileInput">Choose Excel File:</label>
+        <input type="file" id="fileInput" name="excelFile" class="form-control" accept=".xls, .xlsx" />
+    </div>
+    <button type="submit">Загрузить в базу данных</button>
+</form>
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">
+        @ViewBag.Message
+    </div>
+}
