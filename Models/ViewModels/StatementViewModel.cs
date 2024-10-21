@@ -1,5 +1,6 @@
 ﻿namespace Task2.Models.ViewModels
 {
+    //Модель вывода данных отчёта на страницу пользователя
     public class StatementViewModel
     {
         public int StatementID { get; set; }

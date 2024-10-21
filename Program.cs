@@ -13,11 +13,15 @@ namespace Task2
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             
+            //создание фабрики подключений на весь проект
             builder.Services.AddDbContextFactory<TaskDbContext>(options =>
             {
+                //получение строки подключения из файла конфигурации appsettings.json
                 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                //Настройка для использования базы данных Sql Server
                 options.UseSqlServer(connectionString);
             });
+            //добавление 1 экземпляра ExcelService на весь проект
             builder.Services.AddSingleton<ExcelService>();
 
             var app = builder.Build();
@@ -39,7 +43,7 @@ namespace Task2
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}");
 
             app.Run();
         }

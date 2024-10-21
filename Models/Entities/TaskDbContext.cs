@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Task2.Models.Entities;
 
+//Класс контескта вззаимодействия с бд 
+//Работа происходит через ORM, используя EntityFrameworkCore
 public partial class TaskDbContext : DbContext
 {
     public TaskDbContext()
@@ -14,7 +16,7 @@ public partial class TaskDbContext : DbContext
         : base(options)
     {
     }
-
+    
     public virtual DbSet<AccountClass> AccountClasses { get; set; }
 
     public virtual DbSet<Bank> Banks { get; set; }
@@ -25,6 +27,7 @@ public partial class TaskDbContext : DbContext
 
     public virtual DbSet<Turnover> Turnovers { get; set; }
 
+    //Метод настройки конфигурации. Работает при неинициализированной фабрике
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)//Аварийный случай
@@ -32,6 +35,7 @@ public partial class TaskDbContext : DbContext
             optionsBuilder.UseSqlServer("Data Source=DESKTOP-93G6P48\\USEFUL;Initial Catalog=B1Task2;Integrated Security=True;Encrypt=False");
         }
     }
+    //Метод создания моделей в ORM и настройка связей между ними
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AccountClass>(entity =>

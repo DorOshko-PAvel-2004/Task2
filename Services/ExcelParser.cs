@@ -9,50 +9,46 @@ using NPOI.XSSF.UserModel;
 
 namespace Task2.Services
 {
+    //Класс по работе с excel файлами
     class ExcelParser
     {
+        //Возврат строк оборотов из отчёта
         public Dictionary<string, List<string[]>> ReadRowsExcel(string filePath)
         {
             // Словарь для хранения данных по классам
             Dictionary<string, List<string[]>> classData;
+            //Создание потока чтения из файла
             using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                // Открываем файл .xls
+                // Открываем excel файл
                 var workbook = WorkbookFactory.Create(fileStream);
                 var sheet = workbook.GetSheetAt(0); // Получаем первый лист
-                                                    //ReadHead(sheet);
+                //Чтение из отчёта строк оборотов на листе excel 
                 classData = ReadTurnovers(sheet);
             }
             return classData;
-            /*// Пример вывода данных
-            foreach (var classEntry in classData)
-            {
-                Console.WriteLine($"Класс: {classEntry.Key}");
-                foreach (var row in classEntry.Value)
-                {
-                    Console.WriteLine($"Счёт банка: {row[0]}, Входящее сальдо (Актив): {row[1]}, Входящее сальдо (Пассив): {row[2]}, " +
-                                      $"Обороты (Дебет): {row[3]}, Обороты (Кредит): {row[4]}, Исходящее сальдо (Актив): {row[5]}, Исходящее сальдо (Пассив): {row[6]}");
-                }
-                Console.WriteLine("------------------------------------------------");
-            }*/
         }
+        //Возврат головной части отчёта из excel файла
         public Dictionary<string, string> ReadHeadExcel(string filePath)
         {
 
             Dictionary<string, string> headData;
+            //Открытие потока чтения из файла
             using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                // Открываем файл .xls
+                // Открываем excel файл 
                 var workbook = WorkbookFactory.Create(fileStream); 
                 var sheet = workbook.GetSheetAt(0); // Получаем первый лист
+                //чтение головной части из отчёта
                 headData = ReadHead(sheet);
             }
             return headData;
         }
-
+        //Чтение строк оборотв из отчёта
         Dictionary<string, List<string[]>> ReadTurnovers(ISheet sheet)
         {
             string currentClass = null;
+            //Журнал значений оборотов по классам
             Dictionary<string, List<string[]>> classData = new Dictionary<string, List<string[]>>();
             // Начало данных
             int startRow = 7; // Строка начала данных
@@ -66,10 +62,11 @@ namespace Task2.Services
                 {
                     string firstCell = currentRow.GetCell(0)?.ToString();
 
-                    // Проверка, является ли первая ячейка названием класса
+                    // Проверка, не является ли первая ячейка б/сч
                     if (!string.IsNullOrWhiteSpace(firstCell) && !IsNumeric(firstCell) && !IsGeneral(firstCell))
                     {
                         currentClass = firstCell;
+                        //Если такой класс не попадался, добавляем в список
                         if (!classData.ContainsKey(currentClass))
                         {
                             classData[currentClass] = new List<string[]>();
@@ -77,7 +74,7 @@ namespace Task2.Services
                     }
                     else if (currentClass != null)
                     {
-                        // Читаем данные столбцов A-G
+                        // Чтение данных столбцов A-G 
                         if (currentRow.GetCell(0)?.ToString().Count() == 4)
                         {
                             string[] rowData = new string[7];
@@ -95,11 +92,15 @@ namespace Task2.Services
             return classData;
         }
 
+        //чтение головной части из отчёта
         Dictionary<string, string> ReadHead(ISheet sheet)
         {
+            //Словарь головой части. Ключ - суть записываемой информации
             Dictionary<string, string> head = new Dictionary<string, string>();
+            //получение названия банка с первой строки
             var firstRow = sheet.GetRow(0);
             string bankName = firstRow.GetCell(0)?.ToString();
+            //получение даты создания отчёта и валюты оборотов
             var dateRow = sheet.GetRow(5);
             DateTime date = Convert.ToDateTime(dateRow.GetCell(0).ToString());
             string inCurrency = dateRow.GetCell(6)?.ToString();
@@ -107,6 +108,7 @@ namespace Task2.Services
             head.Add("BankName", bankName);
             head.Add("CreationDate", date.ToString());
             head.Add("CurrencyType", inCurrency);
+            //запись в слловарь полного названия отчёта
             string name = "";
             for (int i = 1; i < 5; i++)
             {
@@ -122,7 +124,7 @@ namespace Task2.Services
         {
             return double.TryParse(value, out _);
         }
-
+        //Проверка при чтении строк для пропуска итоговых значений по классу
         bool IsGeneral(string value)
         {
             return value.Contains("ПО КЛАССУ");
